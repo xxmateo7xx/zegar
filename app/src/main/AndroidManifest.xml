@@ -23,12 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ClockActivity"
-            android:exported="false"
-            android:label="@string/title_activity_clock"
-            android:theme="@style/Theme.Zegary"
-            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
