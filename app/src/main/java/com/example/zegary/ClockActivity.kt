@@ -9,15 +9,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.zegary.ui.theme.ZegaryTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -80,7 +84,20 @@ fun WorldClocksScreen(zones: List<String>, modifier: Modifier = Modifier) {
         DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.getDefault())
     }
 
-    val nowInstant = Instant.now()
+    var nowInstant by remember { mutableStateOf(Instant.now()) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (isActive) {
+                nowInstant = Instant.now()
+                Log.d("Lab6_Tick", "Odświeżono zegary: $nowInstant")
+                val millisToNextSecond = 1000L - (System.currentTimeMillis() % 1000L)
+                delay(millisToNextSecond)
+            }
+        }
+    }
+
     val localZone = ZoneId.systemDefault()
     val localTime = ZonedDateTime.ofInstant(nowInstant, localZone)
 
